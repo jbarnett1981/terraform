@@ -1,0 +1,6 @@
+---
+  - hosts: all
+    gather_facts: false
+    tasks:
+      - name: run bootstrap.sh
+        script: bootstrap.sh

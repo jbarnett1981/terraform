@@ -1,0 +1,4 @@
+# S3 bucket info
+bucket = "mybucket"
+region = "us-west-2"
+key    = "path/to/dev/terraform.tfstate"

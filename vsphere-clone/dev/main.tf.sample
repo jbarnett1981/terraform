@@ -1,0 +1,49 @@
+terraform {
+  backend "s3" {
+  }
+}
+
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = "${var.bucket}"
+    key    = "${var.key}"
+    region = "${var.region}"
+  }
+}
+
+provider "vsphere" {
+  user                 = "${var.vsphere_user}"
+  password             = "${var.vsphere_password}"
+  vsphere_server       = "${var.vsphere_server}"
+  allow_unverified_ssl = true
+}
+
+module "infra" {
+  source = "../modules/k8s-infra"
+
+  # vsphere vars
+  vsphere_datacenter               = "datstore01"
+  vsphere_resource_pool            = "pool01"
+  vsphere_datastore                = "dc01"
+  vsphere_network                  = "VM_Network"
+  vsphere_virtual_machine_template = "template01"
+  # vm vars
+  num_vms           = "6"
+  vm_mem_size       = "32768"
+  vm_num_cpus       = "8"
+  vm_name_prefix    = "test-vm"
+  vm_domain_suffix  = "test.example.org"
+  vm_admin_user     = "root"
+  vm_admin_password = "root"
+  ssh-pub-key       = "${var.ssh-pub-key}"
+
+  providers = {
+    vsphere = "vsphere"
+  }
+}
+
+
+output "ips" {
+  value = "${module.infra.ips}"
+}
